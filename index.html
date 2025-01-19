@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Collector</title>
+</head>
+<body>
+  <h1>Email Collector</h1>
+  <form id="emailForm">
+    <label for="emailInput">Enter your email:</label>
+    <input type="email" id="emailInput" placeholder="Email address" required>
+    <button type="submit">Submit</button>
+  </form>
+
+  <p id="statusMessage"></p>
+
+  <script type="module">
+    // Import Firebase initialization and Firestore functions
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+
+    // Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDByaFJ9Wn4KQ9Re0YWdH2T8UXhWVVXD4o",
+      authDomain: "email-signup-d372d.firebaseapp.com",
+      databaseURL: "https://email-signup-d372d-default-rtdb.firebaseio.com",
+      projectId: "email-signup-d372d",
+      storageBucket: "email-signup-d372d.firebasestorage.app",
+      messagingSenderId: "99927470142",
+      appId: "1:99927470142:web:03d7f58df49121ac34e16f",
+      measurementId: "G-N6WYNHRFK3"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Handle form submission
+    document.getElementById('emailForm').addEventListener('submit', async (e) => {
+      e.preventDefault(); // Prevent the default form submission
+
+      const emailInput = document.getElementById('emailInput');
+      const email = emailInput.value.trim();
+      const statusMessage = document.getElementById('statusMessage');
+
+      if (!email) {
+        statusMessage.textContent = "Please enter a valid email.";
+        statusMessage.style.color = "red";
+        return;
+      }
+
+      try {
+        // Add email to Firestore
+        await addDoc(collection(db, "emails"), {
+          email: email,
+          timestamp: serverTimestamp() // Set the timestamp to the current time
+        });
+
+        statusMessage.textContent = "Email submitted successfully!";
+        statusMessage.style.color = "green";
+
+        // Clear the input field
+        emailInput.value = "";
+      } catch (error) {
+        console.error("Error adding document: ", error);
+        statusMessage.textContent = "An error occurred. Please try again.";
+        statusMessage.style.color = "red";
+      }
+    });
+  </script>
+</body>
+</html>
